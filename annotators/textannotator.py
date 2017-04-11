@@ -7,15 +7,14 @@
 
 # Load text_analyzer module
 import sys
-sys.path.insert(0, '/Users/DoraDorita/Desktop/NLP/engines')
 from text_analyzer import *
 
 # Load corpus to annotate
-corpusf_path = '/Users/DoraDorita/Desktop/NLP/corpus/'
+corpusf_path = './corpus/'
 corpusf_name = raw_input('\nCorpus file name: ')
 
 # The corpus is stored in a list (lowercase)
-corpusf = open(corpusf_path+corpusf_name, 'r')
+corpusf = open(corpusf_path + corpusf_name, 'r')
 corpus = []
 for l in corpusf:
     l = l.rstrip()
@@ -24,7 +23,10 @@ for l in corpusf:
         corpus.append(l)
 corpusf.close()
 
-# Function to annotate loaded corpus. It returns a dictionary with positive (annotated) and negative (non-annotated) messages
+# Function to annotate loaded corpus. It returns a dictionary with
+# positive (annotated) and negative (non-annotated) messages
+
+
 def create_annotated_corpus(corpus):
     # language_data stores language resources to analyze text messages
     language_data = language_data_loader()
@@ -34,8 +36,9 @@ def create_annotated_corpus(corpus):
     cnt = 0
     print '\nAnnotating ', len(corpus), ' left...', '\n'
     for l in corpus:
-        cnt = cnt +1
-        analysis_result = analyzer(l,language_data['start_words'],language_data['grammar'],language_data['stop_words'])
+        cnt = cnt + 1
+        analysis_result = analyzer(
+            l, language_data['start_words'], language_data['grammar'], language_data['stop_words'])
         if analysis_result != '<nothing found>':
             positive_analysis = []
             positive_analysis.append(analysis_result[0])
@@ -47,16 +50,23 @@ def create_annotated_corpus(corpus):
             annotated_corpus['negative'].append(l)
     return annotated_corpus
 
-# The annotation process consists of steps. In each step we can pass over the message (and delete it from corpus), or try modifications on it if we do not agree with the resulting analysis
+# The annotation process consists of steps. In each step we can pass over
+# the message (and delete it from corpus), or try modifications on it if
+# we do not agree with the resulting analysis
+
+
 def annotation_step(message):
     try_or_go = raw_input('(t)ry / (g)o ? ')
     launch_create_annotated_corpus = False
     while try_or_go == 't':
         language_data = language_data_loader()
-        analysis_result = analyzer(message,language_data['start_words'],language_data['grammar'],language_data['stop_words'])
+        analysis_result = analyzer(
+            message, language_data['start_words'], language_data['grammar'], language_data['stop_words'])
         if analysis_result != '<nothing found>':
-            testing_message = message.replace(analysis_result[0], ' [ '+analysis_result[0]+' ] ')
-            testing_message = testing_message.replace(analysis_result[1], '< '+analysis_result[1]+' >')
+            testing_message = message.replace(
+                analysis_result[0], ' [ ' + analysis_result[0] + ' ] ')
+            testing_message = testing_message.replace(
+                analysis_result[1], '< ' + analysis_result[1] + ' >')
             print '\n'
             print testing_message, ' | ', analysis_result[2]
             print '\n'
@@ -72,7 +82,10 @@ def annotation_step(message):
         corpus.remove(message)
     return launch_create_annotated_corpus
 
-# This function starts the whole annotation process, and calls the latter on each step
+# This function starts the whole annotation process, and calls the latter
+# on each step
+
+
 def annotation_process():
     annotated_corpus = create_annotated_corpus(corpus)
     while len(corpus) > 0:
@@ -83,7 +96,7 @@ def annotation_process():
                 print '\n'
                 if annotation_step(message) is True:
                     annotated_corpus = create_annotated_corpus(corpus)
-                    break                 
+                    break
                 else:
                     if annotated_corpus['negative'].index(message) != -1:
                         annotated_corpus['negative'].remove(message)
@@ -93,8 +106,10 @@ def annotation_process():
                         break
         else:
             for positive_item in annotated_corpus['positive']:
-                testing_message = positive_item[3].replace(positive_item[0], ' [ '+positive_item[0]+' ] ')
-                testing_message = testing_message.replace(positive_item[1], '< '+positive_item[1]+' >')
+                testing_message = positive_item[3].replace(
+                    positive_item[0], ' [ ' + positive_item[0] + ' ] ')
+                testing_message = testing_message.replace(
+                    positive_item[1], '< ' + positive_item[1] + ' >')
                 print '\n'
                 print testing_message, ' | ', positive_item[2]
                 print '\n'
@@ -111,5 +126,6 @@ def annotation_process():
     else:
         print '\n' + '*** No more messages ***' + '\n'
         quit()
+
 
 annotation_process()

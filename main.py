@@ -12,7 +12,6 @@ import json
 from datetime import datetime
 from engines import user_analyzer
 from engines import text_analyzer
-# sys.path.insert(0, '/Users/DoraDorita/Desktop/NLP/engines')
 
 
 def demo(external_input):

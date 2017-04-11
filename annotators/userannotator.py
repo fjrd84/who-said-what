@@ -7,15 +7,14 @@
 
 # Load user_analyzer module
 import sys
-sys.path.insert(0, '/Users/DoraDorita/Desktop/NLP/engines')
 from user_analyzer import *
 
 # Load corpus to annotate
-corpusf_path = '/Users/DoraDorita/Desktop/NLP/corpus/'
+corpusf_path = './corpus/'
 corpusf_name = raw_input('\nCorpus file name: ')
 
 # The corpus is stored in a list (lowercase)
-corpusf = open(corpusf_path+corpusf_name, 'r')
+corpusf = open(corpusf_path + corpusf_name, 'r')
 corpus = []
 for l in corpusf:
     l = l.rstrip()
@@ -24,7 +23,10 @@ for l in corpusf:
         corpus.append(l)
 corpusf.close()
 
-# Function to annotate loaded corpus. It returns a dictionary with positive (annotated) and negative (non-annotated) messages
+# Function to annotate loaded corpus. It returns a dictionary with
+# positive (annotated) and negative (non-annotated) messages
+
+
 def create_annotated_corpus(corpus):
     # language_data stores language resources to analyze users' descriptions
     generated_lexicon = lexicon_generator()
@@ -34,8 +36,8 @@ def create_annotated_corpus(corpus):
     cnt = 0
     print '\nAnnotating ', len(corpus), ' left...', '\n'
     for l in corpus:
-        cnt = cnt +1
-        analysis_result = user_analyzer(l,generated_lexicon)
+        cnt = cnt + 1
+        analysis_result = user_analyzer(l, generated_lexicon)
         if analysis_result[1] != '<unknown source>':
             positive_analysis = []
             positive_analysis.append(analysis_result[0])
@@ -46,15 +48,20 @@ def create_annotated_corpus(corpus):
             annotated_corpus['negative'].append(l)
     return annotated_corpus
 
-# The annotation process consists of steps. In each step we can pass over the message (and delete it from corpus), or try modifications on it if we do not agree with the resulting analysis
+# The annotation process consists of steps. In each step we can pass over
+# the message (and delete it from corpus), or try modifications on it if
+# we do not agree with the resulting analysis
+
+
 def annotation_step(user_description):
     try_or_go = raw_input('(t)ry / (g)o ? ')
     launch_create_annotated_corpus = False
     while try_or_go == 't':
         generated_lexicon = lexicon_generator()
-        analysis_result = user_analyzer(user_description,generated_lexicon)
+        analysis_result = user_analyzer(user_description, generated_lexicon)
         if analysis_result != '<unknown source>':
-            testing_user_description = user_description.replace(analysis_result[1], ' [ '+analysis_result[1]+' ] ')
+            testing_user_description = user_description.replace(
+                analysis_result[1], ' [ ' + analysis_result[1] + ' ] ')
             print '\n'
             print testing_user_description, ' | ', analysis_result[0]
             print '\n'
@@ -70,7 +77,10 @@ def annotation_step(user_description):
         corpus.remove(user_description)
     return launch_create_annotated_corpus
 
-# This function starts the whole annotation process, and calls the latter on each step
+# This function starts the whole annotation process, and calls the latter
+# on each step
+
+
 def annotation_process():
     annotated_corpus = create_annotated_corpus(corpus)
     while len(corpus) > 0:
@@ -81,7 +91,7 @@ def annotation_process():
                 print '\n'
                 if annotation_step(user_description) is True:
                     annotated_corpus = create_annotated_corpus(corpus)
-                    break                 
+                    break
                 else:
                     if annotated_corpus['negative'].index(user_description) != -1:
                         annotated_corpus['negative'].remove(user_description)
@@ -91,7 +101,8 @@ def annotation_process():
                         break
         else:
             for positive_item in annotated_corpus['positive']:
-                testing_user_description = positive_item[2].replace(positive_item[1], ' [ '+positive_item[1]+' ] ')
+                testing_user_description = positive_item[2].replace(
+                    positive_item[1], ' [ ' + positive_item[1] + ' ] ')
                 print '\n'
                 print testing_user_description, ' | ', positive_item[0]
                 print '\n'
@@ -108,5 +119,6 @@ def annotation_process():
     else:
         print '\n' + '*** No more user_descriptions ***' + '\n'
         quit()
+
 
 annotation_process()
