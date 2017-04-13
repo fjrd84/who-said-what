@@ -1,1 +1,6 @@
 spacy
+nose
+coverage
+pytest-mock
+pytest-watch
+configparser
