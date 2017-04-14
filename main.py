@@ -13,44 +13,50 @@ from datetime import datetime
 from engines import user_analyzer
 from engines import text_analyzer
 
-# Initialization
-DICTIONARY = user_analyzer.dictionary_parser('./language_data/user_dictionary.txt')
-LEXICON = user_analyzer.lexicon_generator('./language_data/user_grammar.txt', DICTIONARY)
+## Initialization ##
 
-def demo(external_input):
+# User analysis
+DICTIONARY = user_analyzer.dictionary_parser(
+    './language_data/user_dictionary.txt')
+
+LEXICON = user_analyzer.lexicon_generator(
+    './language_data/user_grammar.txt', DICTIONARY)
+# Text analysis
+LANGUAGE_DATA = text_analyzer.language_data_loader()
+
+
+def job_analyzer(job_json):
     """
-    Start the demo
+    It takes a job as an input and returns an analysis.
     """
-    # Language sources:
-
-    language_data = text_analyzer.language_data_loader()
-
-    input_data = json.loads(external_input)
-    output_data = dict()
+    analysis = dict()
     # Get 'profile' and 'health_related'
-    output_data['profile'] = user_analyzer.user_analyzer(
-        input_data['user_description'], LEXICON)[1]
-    if output_data['profile'] != '<unknown source>':
-        output_data['health_related'] = True
-    else:
-        output_data['health_related'] = False
-    # Get 'solution'
-    output_data['solution'] = text_analyzer.analyzer(
-        input_data['message'], language_data['start_words'],
-        language_data['grammar'], language_data['stop_words'])[0]
-    # Get 'problem'
-    output_data['problem'] = text_analyzer.analyzer(
-        input_data['message'], language_data['start_words'],
-        language_data['grammar'], language_data['stop_words'])[1]
-    # Get 'date'
-    output_data['created_at'] = str(datetime.now())
-    return json.dumps(output_data)
+    analysis['profile'] = user_analyzer.user_analyzer(job_json['user_description'],
+                                                      LEXICON)[1]
+
+    # Identified medical sources will be tagged as health related
+    analysis['health_related'] = analysis['profile'] != '<unknown source>'
+
+    # Get a 'solution'
+    analysis['solution'] = text_analyzer.analyzer(job_json['message'],
+                                                  LANGUAGE_DATA['start_words'],
+                                                  LANGUAGE_DATA['grammar'],
+                                                  LANGUAGE_DATA['stop_words'])[0]
+    # Get a 'problem'
+    analysis['problem'] = text_analyzer.analyzer(job_json['message'],
+                                                 LANGUAGE_DATA['start_words'],
+                                                 LANGUAGE_DATA['grammar'],
+                                                 LANGUAGE_DATA['stop_words'])[1]
+
+    # Save the analysis timestamp
+    analysis['created_at'] = datetime.now().isoformat()
+    return json.dumps(analysis)
 
 
 if __name__ == "__main__":
-    # Testing demo in corpus:
+    # Test the job_analyzer using corpus data
     CORPUS = open(
         './corpus/heart_disease_cholesterol_hypertension_diabetes_obesity.json', 'r').readlines()
+
     for line in CORPUS:
-        line = line.rstrip()
-        print(demo(line))
+        print(job_analyzer(json.loads(line.rstrip())))
