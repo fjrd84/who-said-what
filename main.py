@@ -5,13 +5,11 @@ main.py
 
 NLP engine demo
 """
-
-# Libraries
-# import sys
 import json
 from datetime import datetime
 from engines import user_analyzer
 from engines import text_analyzer
+
 
 ## Initialization ##
 
