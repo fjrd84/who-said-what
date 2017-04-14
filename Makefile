@@ -8,7 +8,7 @@ test:
 	export PYTHONPATH=.;pytest tests
 
 watchtest:
-	export PYTHONPATH=.;pytest-watch tests 
+	export PYTHONPATH=.;pytest-watch . --ignore venv
 
 coverage:
 	nosetests --with-coverage --cover-erase --cover-html --cover-package=analyzer
