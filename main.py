@@ -13,20 +13,23 @@ from datetime import datetime
 from engines import user_analyzer
 from engines import text_analyzer
 
+# Initialization
+DICTIONARY = user_analyzer.dictionary_parser('./language_data/user_dictionary.txt')
+LEXICON = user_analyzer.lexicon_generator('./language_data/user_grammar.txt', DICTIONARY)
 
 def demo(external_input):
     """
     Start the demo
     """
     # Language sources:
+
     language_data = text_analyzer.language_data_loader()
-    generated_lexicon = user_analyzer.lexicon_generator()
 
     input_data = json.loads(external_input)
     output_data = dict()
     # Get 'profile' and 'health_related'
     output_data['profile'] = user_analyzer.user_analyzer(
-        input_data['user_description'], generated_lexicon)[1]
+        input_data['user_description'], LEXICON)[1]
     if output_data['profile'] != '<unknown source>':
         output_data['health_related'] = True
     else:

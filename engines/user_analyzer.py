@@ -1,35 +1,35 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
-# Pending screen user name analysis (e.g. @user, MD)
-
-import re
-path_to_language_data = './language_data/'
+"""
 
 ###################
 ## User Analyzer ##
 ###################
 
-# This program receives a user description input, and extracts key information from it to categorize the profile of the user (e.g. 'Proud husband. Radiologist at Mayo clinic and Runner' --> 'Radiologist at Mayo Clinic')
-# user_analyzer consists of 2 functions: (1) lexicon_generator loads
-# linguistic knowledge to feed the analyzer (a simple NLP engine), (2)
-# user_analyzer uses information from the previous input to annotate the
-# key words or expression which best categorizes the profile of the user.
+This program receives a user description input, and extracts key information
+from it to categorize the profile of the user (e.g. 'Proud husband. Radiologist
+at Mayo clinic and Runner' --> 'Radiologist at Mayo Clinic')
+user_analyzer consists of 2 functions: (1) lexicon_generator loads
+linguistic knowledge to feed the analyzer (a simple NLP engine), (2)
+user_analyzer uses information from the previous input to annotate the
+key words or expression which best categorizes the profile of the user.
 
-# (1) Language data loader:
+"""
 
 
-def lexicon_generator():
+# Pending screen user name analysis (e.g. @user, MD)
+import re
 
-    # The resulting lexicon is stored at:
-    generated_lexicon = dict()
 
-    # 1) Create a dictionary of words (hospital, clinic) linked to nodes, e.g. <MEDICAL_PLACE>
-    # The input file 'user_dictionary.txt' should be as follows:
-    dictionary_f = open(path_to_language_data + 'user_dictionary.txt', 'r')
-    # (1 entry per line), e.g.
-    # <MEDICAL_PLACE> \t hospital
-    # <MEDICAL_PROFESSION> \t anesthesiologist
+def dictionary_parser(dictionary_file_path):
+    """
+    1) Create a dictionary of words (hospital, clinic) linked to nodes, e.g. <MEDICAL_PLACE>
+    The input file 'user_dictionary.txt' should be as follows:
+    (1 entry per line), e.g.
+    <MEDICAL_PLACE> \t hospital
+    <MEDICAL_PROFESSION> \t anesthesiologist
+    """
+    dictionary_f = open(dictionary_file_path, 'r')
     dictionary = dict()
     for l in dictionary_f:
         l = l.rstrip()
@@ -49,7 +49,7 @@ def lexicon_generator():
                     insidenode_l = item.split('|')
                     for insidenode in insidenode_l:
                         if insidenode in dictionary.keys():
-                            for w in dictonary[insidenode]:
+                            for w in dictionary[insidenode]:
                                 if w not in dictionary[entry[0]]:
                                     dictionary[entry[0]].append(w)
                         dictionary[entry[0]].remove(insidenode)
@@ -60,13 +60,20 @@ def lexicon_generator():
                             if w not in dictionary[entry[0]]:
                                 dictionary[entry[0]].append(w)
                     dictionary[entry[0]].remove(insidenode)
+    dictionary_f.close()
+    return dictionary
 
-    # 2) Generate a lexicon from a set of simple grammar patterns and the previous dictionary:
-    # The file user_grammar.txt should be as follows:
-    # (1 entry per line), e.g.
-    # ¡<MEDICAL_PROFESSION> in <MEDICAL_PLACE>¡
-    # The symnol '¡' sets the text span to display as annotation
-    user_grammar_f = open(path_to_language_data + 'user_grammar.txt', 'r')
+
+def lexicon_generator(grammar_file_path, dictionary):
+    """
+    2) Generate a lexicon from a set of simple grammar patterns and a dictionary:
+    The file user_grammar.txt should be as follows:
+    (1 entry per line), e.g.
+    ¡<MEDICAL_PROFESSION> in <MEDICAL_PLACE>¡
+    The symnol '¡' sets the text span to display as annotation
+    """
+    generated_lexicon = dict()
+    user_grammar_f = open(grammar_file_path, 'r')
     pattern_list = user_grammar_f.readlines()
     for l in pattern_list[:len(pattern_list) - 2]:
         l = l.rstrip()
@@ -98,7 +105,6 @@ def lexicon_generator():
             generated_lexicon[full_pattern].append(displaying_instance)
         else:
             generated_lexicon[full_pattern].append(displaying_instance)
-    dictionary_f.close()
     user_grammar_f.close()
     return generated_lexicon
 
@@ -127,14 +133,3 @@ def user_analyzer(user_description, generated_lexicon):
         result.append('<no pattern>')
         result.append('<unknown source>')
     return result
-
-# print user_analyzer('interventional radiologist at the university of virginia. tweets are my own.',lexicon_generator())
-# path_to_testing_corpus = '/Users/DoraDorita/Desktop/NLP/corpus/'
-# corpus = open(path_to_testing_corpus+'all.txt', 'r').readlines()
-# generated_lexicon = lexicon_generator()
-# for l in corpus:
-#     l = l.split('  @@@  ')[1]
-#     l = l.rstrip().lower()
-#     result = user_analyzer(l,generated_lexicon)
-#     if result != '<unknown source>':
-#         print result[1]
