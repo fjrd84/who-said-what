@@ -18,9 +18,9 @@ from engines import text_analyzer
 # User analysis
 DICTIONARY = user_analyzer.dictionary_parser(
     './language_data/user_dictionary.txt')
-
 LEXICON = user_analyzer.lexicon_generator(
     './language_data/user_grammar.txt', DICTIONARY)
+
 # Text analysis
 LANGUAGE_DATA = text_analyzer.language_data_loader()
 
@@ -37,16 +37,14 @@ def job_analyzer(job_json):
     # Identified medical sources will be tagged as health related
     analysis['health_related'] = analysis['profile'] != '<unknown source>'
 
-    # Get a 'solution'
-    analysis['solution'] = text_analyzer.analyzer(job_json['message'],
-                                                  LANGUAGE_DATA['start_words'],
-                                                  LANGUAGE_DATA['grammar'],
-                                                  LANGUAGE_DATA['stop_words'])[0]
-    # Get a 'problem'
-    analysis['problem'] = text_analyzer.analyzer(job_json['message'],
-                                                 LANGUAGE_DATA['start_words'],
-                                                 LANGUAGE_DATA['grammar'],
-                                                 LANGUAGE_DATA['stop_words'])[1]
+    # The text analyzer inferes a health related problem and its solution, when available
+    text_analysis = text_analyzer.analyzer(job_json['message'],
+                                           LANGUAGE_DATA['start_words'],
+                                           LANGUAGE_DATA['grammar'],
+                                           LANGUAGE_DATA['stop_words'])
+
+    analysis['solution'] = text_analysis[0]
+    analysis['problem'] = text_analysis[1]
 
     # Save the analysis timestamp
     analysis['created_at'] = datetime.now().isoformat()
