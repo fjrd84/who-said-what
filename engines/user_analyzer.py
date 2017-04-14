@@ -86,8 +86,8 @@ def lexicon_generator(grammar_file_path, dictionary):
         # displaying_instance]
         generated_lexicon[full_pattern] = []
         # (a) 'instance' matches the whole pattern
-        if re.search('<\S+?>', pattern):
-            node_list = re.findall('<\S+?>', pattern)
+        if re.search(r'<\S+?>', pattern):
+            node_list = re.findall(r'<\S+?>', pattern)
             for node in node_list:
                 if node in dictionary.keys():
                     instance = re.sub(
@@ -95,9 +95,10 @@ def lexicon_generator(grammar_file_path, dictionary):
             generated_lexicon[full_pattern].append(instance)
         else:
             generated_lexicon[full_pattern].append(instance)
-        # (b) 'displaying_instance' matches key words inside the pattern to better categorize the user's description
-        if re.search('<\S+?>', displaying_pattern):
-            node_list = re.findall('<\S+?>', displaying_pattern)
+        # (b) 'displaying_instance' matches key words inside the pattern to better
+        # categorize the user's description
+        if re.search(r'<\S+?>', displaying_pattern):
+            node_list = re.findall(r'<\S+?>', displaying_pattern)
             for node in node_list:
                 if node in dictionary.keys():
                     displaying_instance = re.sub(
