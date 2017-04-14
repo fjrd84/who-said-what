@@ -111,12 +111,16 @@ def lexicon_generator(grammar_file_path, dictionary):
 # (2) Analyzer:
 
 
-def user_analyzer(user_description, generated_lexicon):
+def user_analyzer(user_description, lexicon):
+    """
+    Given a user description and a lexicon, it inferes if the user is health
+    related or not.
+    """
     longest_match = ''
     # 'matching_pattern' and 'result' are only for annotation purposes (in userannotator)
     matching_pattern = ''
     result = []
-    for full_pattern, instance_pair in generated_lexicon.items():
+    for full_pattern, instance_pair in lexicon.items():
         if re.search(instance_pair[0], user_description):
             possible_match = user_description[re.search(instance_pair[0], user_description).start(
             ):re.search(instance_pair[0], user_description).end()]
@@ -124,7 +128,7 @@ def user_analyzer(user_description, generated_lexicon):
                 longest_match = possible_match
                 matching_pattern = full_pattern
     if len(longest_match) > 0:
-        displaying_instance = generated_lexicon[matching_pattern][1]
+        displaying_instance = lexicon[matching_pattern][1]
         displaying_match = user_description[re.search(displaying_instance, user_description).start(
         ):re.search(displaying_instance, user_description).end()]
         result.append(matching_pattern)
