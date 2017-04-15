@@ -5,7 +5,7 @@ init:
 	pip3 install -r requirements.txt; python3 -m spacy.en.download all
 
 test:
-	export PYTHONPATH=.;pytest tests -v
+	export PYTHONPATH=.;pytest tests -vv
 
 watchtest:
 	export PYTHONPATH=.;pytest-watch . --ignore venv
