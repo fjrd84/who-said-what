@@ -20,6 +20,7 @@ key words or expression which best categorizes the profile of the user.
 # Pending screen user name analysis (e.g. @user, MD)
 import re
 
+
 def is_tag(value):
     """
     It identifies a value as tag
@@ -32,6 +33,7 @@ def is_tag(value):
     """
     pattern = re.compile("<[A-Z_]+>")
     return pattern.match(value)
+
 
 def dictionary_parser(dictionary_file_path):
     """
@@ -81,11 +83,10 @@ def lexicon_generator(grammar_file_path, dictionary):
     generated_lexicon = dict()
     user_grammar_f = open(grammar_file_path, 'r')
     pattern_list = user_grammar_f.readlines()
-    for l in pattern_list[:len(pattern_list) - 2]:
-        l = l.rstrip()
-        full_pattern = l
-        displaying_pattern = l.split('¡')[1]
-        pattern = l.replace('¡', '')
+    for full_pattern in pattern_list:
+        full_pattern = full_pattern.rstrip()
+        displaying_pattern = full_pattern.split('¡')[1]
+        pattern = full_pattern.replace('¡', '')
         instance = pattern
         displaying_instance = displaying_pattern
         # generated_lexicon is as follows: {'full_pattern'}: [instance,
