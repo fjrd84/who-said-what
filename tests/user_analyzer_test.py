@@ -3,6 +3,9 @@ Test the user analyzer engine
 """
 from engines import user_analyzer
 
+USER_DICTIONARY = './tests/demo_user_dictionary.txt'
+USER_GRAMMAR = './tests/demo_user_grammar.txt'
+
 
 def test_is_tag():
     """
@@ -21,8 +24,7 @@ def test_dictionary_parser():
     """
     Parse a demo dictionary
     """
-    dictionary = user_analyzer.dictionary_parser(
-        './tests/demo_user_dictionary.txt')
+    dictionary = user_analyzer.dictionary_parser(USER_DICTIONARY)
     assert dictionary['<DISEASE>'] == ['liver cancer']
     assert dictionary['<MEDICAL_FIELD>'] == ['family medicine', 'biotech']
     assert dictionary['<MEDICAL_ATTRIBUTE>'] == ['family medicine', 'biotech']
@@ -34,10 +36,41 @@ def test_lexicon_generator():
     Generate a demo lexicon from a demo grammar file
     """
 
-    dictionary = user_analyzer.dictionary_parser(
-        './tests/demo_user_dictionary.txt')
-    lexicon = user_analyzer.lexicon_generator('./tests/demo_user_grammar.txt',
+    dictionary = user_analyzer.dictionary_parser(USER_DICTIONARY)
+    lexicon = user_analyzer.lexicon_generator(USER_GRAMMAR,
                                               dictionary)
-    assert lexicon == {'¡working for <MEDICAL_ATTRIBUTE>¡': [
-        'working for (family medicine|biotech)',
-        'working for (family medicine|biotech)']}
+    assert lexicon == {
+        '¡<MEDICAL_ATTRIBUTE> <MEDICAL_FIELD>¡': [
+            '(family medicine|biotech) (family '
+            'medicine|biotech)',
+            '(family medicine|biotech) (family '
+            'medicine|biotech)'],
+        '¡working for <MEDICAL_ATTRIBUTE>¡': [
+            'working for (family medicine|biotech)',
+            'working for (family medicine|biotech)'],
+        '¡<MEDICAL_ATTRIBUTE> (web|portal|site)¡': [
+            '(family medicine|biotech) '
+            '(web|portal|site)',
+            '(family medicine|biotech) '
+            '(web|portal|site)'],
+        '¡<MEDICAL_JOB>¡ (and|&) \\w+': [
+            '(physicist|dermat(ó|o)log(o|a)) (and|&) '
+            '\\w+',
+            '(physicist|dermat(ó|o)log(o|a))']}
+
+
+def test_user_analyzer():
+    """
+    Test the user analyzer function
+    """
+    dictionary = user_analyzer.dictionary_parser(USER_DICTIONARY)
+    lexicon = user_analyzer.lexicon_generator(USER_GRAMMAR, dictionary)
+
+    assert user_analyzer.user_analyzer('Some random person',
+                                       lexicon) == ['<no pattern>', '<unknown source>']
+    assert user_analyzer.user_analyzer('Some physicist and father',
+                                       lexicon) == ['¡<MEDICAL_JOB>¡ (and|&) \\w+', 'physicist']
+    assert user_analyzer.user_analyzer('family medicine website',
+                                       lexicon) ==  ['¡<MEDICAL_ATTRIBUTE> (web|portal|site)¡', 'family medicine web']
+
+
