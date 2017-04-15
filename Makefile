@@ -11,7 +11,7 @@ watchtest:
 	export PYTHONPATH=.;pytest-watch . --ignore venv
 
 coverage:
-	nosetests --with-coverage --cover-erase --cover-html --cover-package=analyzer
+	nosetests --with-coverage --cover-erase --cover-html --cover-package=engines
 
 clean:
 	find . -name "*.pyc" -exec rm -f {} \;
