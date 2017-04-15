@@ -20,6 +20,18 @@ key words or expression which best categorizes the profile of the user.
 # Pending screen user name analysis (e.g. @user, MD)
 import re
 
+def is_tag(value):
+    """
+    It identifies a value as tag
+    A tag looks like this:
+    <THIS_IS_A_TAG>
+
+    These are not tags:
+    <this is not a tag>
+    <THIS IS NO TAG EITHER
+    """
+    pattern = re.compile("<[A-Z_]+>")
+    return pattern.match(value)
 
 def dictionary_parser(dictionary_file_path):
     """
@@ -29,38 +41,32 @@ def dictionary_parser(dictionary_file_path):
     <MEDICAL_PLACE> \t hospital
     <MEDICAL_PROFESSION> \t anesthesiologist
     """
-    dictionary_f = open(dictionary_file_path, 'r')
     dictionary = dict()
-    for l in dictionary_f:
-        l = l.rstrip()
-        entry_list = l.split('\t')
+    dictionary_file = open(dictionary_file_path, 'r')
+
+    for line in dictionary_file:
+        line = line.rstrip()
+        entry_list = line.split('\t')
         if entry_list[0] not in dictionary.keys():
             dictionary[entry_list[0]] = []
             dictionary[entry_list[0]].append(entry_list[1])
         else:
             dictionary[entry_list[0]].append(entry_list[1])
+
+    dictionary_file.close()
+
     # The following loop reads dictionary's entries which have nodes inside,
     # e.g. <MEDICAL_JOB> \t <ADMINISTRATIVE_JOB>. It replaces the node for all
     # its words
-    for entry in dictionary.items():
-        for item in entry[1]:
-            if item.startswith('<'):
-                if '|' in item:
-                    insidenode_l = item.split('|')
-                    for insidenode in insidenode_l:
-                        if insidenode in dictionary.keys():
-                            for w in dictionary[insidenode]:
-                                if w not in dictionary[entry[0]]:
-                                    dictionary[entry[0]].append(w)
-                        dictionary[entry[0]].remove(insidenode)
-                else:
-                    insidenode = item
-                    if insidenode in dictionary.keys():
-                        for w in dictionary[insidenode]:
-                            if w not in dictionary[entry[0]]:
-                                dictionary[entry[0]].append(w)
-                    dictionary[entry[0]].remove(insidenode)
-    dictionary_f.close()
+    for (entry, values) in dictionary.items():
+        nodes = [value.split('|') for value in values if is_tag(value)]
+        for node_variations in nodes:
+            for insidenode in node_variations:
+                if insidenode in dictionary.keys():
+                    for definition in dictionary[insidenode]:
+                        if definition not in dictionary[entry]:
+                            dictionary[entry].append(definition)
+                dictionary[entry].remove('|'.join(node_variations))
     return dictionary
 
 
