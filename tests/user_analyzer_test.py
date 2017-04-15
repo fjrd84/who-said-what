@@ -21,8 +21,23 @@ def test_dictionary_parser():
     """
     Parse a demo dictionary
     """
-    dictionary = user_analyzer.dictionary_parser('./tests/test_dictionary.txt')
+    dictionary = user_analyzer.dictionary_parser(
+        './tests/demo_user_dictionary.txt')
     assert dictionary['<DISEASE>'] == ['liver cancer']
-    assert dictionary['<MEDICAL_FIELD>'] == ['family medicine']
-    assert dictionary['<MEDICAL_ATTRIBUTE>'] == ['family medicine']
+    assert dictionary['<MEDICAL_FIELD>'] == ['family medicine', 'biotech']
+    assert dictionary['<MEDICAL_ATTRIBUTE>'] == ['family medicine', 'biotech']
     assert dictionary['<MEDICAL_JOB>'] == ['physicist', 'dermat(ó|o)log(o|a)']
+
+
+def test_lexicon_generator():
+    """
+    Generate a demo lexicon from a demo grammar file
+    """
+
+    dictionary = user_analyzer.dictionary_parser(
+        './tests/demo_user_dictionary.txt')
+    lexicon = user_analyzer.lexicon_generator('./tests/demo_user_grammar.txt',
+                                              dictionary)
+    assert lexicon == {'¡working for <MEDICAL_ATTRIBUTE>¡': [
+        'working for (family medicine|biotech)',
+        'working for (family medicine|biotech)']}

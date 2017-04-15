@@ -1,0 +1,3 @@
+¡working for <MEDICAL_ATTRIBUTE>¡
+¡<MEDICAL_ATTRIBUTE> <MEDICAL_FIELD>¡
+¡<MEDICAL_ATTRIBUTE> (web|portal|site)¡
