@@ -9,7 +9,7 @@ import json
 from datetime import datetime
 from engines import user_analyzer
 from engines import text_analyzer
-
+from spacy.en import English
 
 ## Initialization ##
 
@@ -19,8 +19,15 @@ DICTIONARY = user_analyzer.dictionary_parser(
 LEXICON = user_analyzer.lexicon_generator(
     './language_data/user_grammar.txt', DICTIONARY)
 
+# Function for text processing with Spacy
+NLP = English()
+
 # Text analysis
-LANGUAGE_DATA = text_analyzer.language_data_loader()
+LANGUAGE_DATA = text_analyzer.language_data_loader(
+    './language_data/grammar.txt',
+    './language_data/start_words.txt',
+    './language_data/stop_words.txt'
+)
 
 
 def job_analyzer(job_json):
@@ -35,11 +42,13 @@ def job_analyzer(job_json):
     # Identified medical sources will be tagged as health related
     analysis['health_related'] = analysis['profile'] != '<unknown source>'
 
-    # The text analyzer inferes a health related problem and its solution, when available
+    # The text analyzer inferes a health related problem and its solution,
+    # when available
     text_analysis = text_analyzer.analyzer(job_json['message'],
                                            LANGUAGE_DATA['start_words'],
+                                           LANGUAGE_DATA['stop_words'],
                                            LANGUAGE_DATA['grammar'],
-                                           LANGUAGE_DATA['stop_words'])
+                                           NLP)
 
     analysis['solution'] = text_analysis[0]
     analysis['problem'] = text_analysis[1]
