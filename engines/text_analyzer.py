@@ -67,19 +67,16 @@ def start_word_match(message, start_words):
     When a match is found, the whole match will be returned. Otherwise,
     None is returned.
     """
-    start_word = ''
+    start_word = None
     for word in start_words:
         if re.search(word, message):
             current_word = message[re.search(word, message).start():
                                    re.search(word, message).end()]
-            if len(current_word) > len(start_word):
+            if start_word is None or len(current_word) > len(start_word):
                 start_word = current_word
     # we search for the longest match ('Mindfulness for anorexia nervosa' gets
     # 'anorexia nervosa' but not 'anorexia', although both are disease terms)
-    if len(start_word) > 0:
-        return start_word
-    elif len(start_word) == 0:
-        return None
+    return start_word
 
 
 def analyzer(message, start_words, stop_words, grammar, nlp):
@@ -97,14 +94,14 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
     longest_match = ''
     matching_pattern = ''
     output = []
-    NP_list = []
+    np_list = []
     # First, check if start_word is in message
     if start_word != None:
         # For every stored grammar rule, generate its counterpart including the
         # start word (e.g. '[s] for [p]' -> '[s] for anorexia')
         for pattern in grammar:
             instance = pattern.replace('[p]', twitter_start_word)
-            instance = re.sub('\s*\[s\]\s*', '', instance)
+            instance = re.sub(r'\s*\[s\]\s*', '', instance)
             # Test every rule against the message:
             if re.search(instance, message):
                 found_instance = instance
@@ -123,22 +120,22 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
                 # target_match = unicode(target_match, "utf-8" )
                 if len(target_match) >= 3:
                     # # Search NPs within target_match (target string):
-                    for np in nlp(target_match).noun_chunks:
-                        NP_list.append(np)
-                    if len(NP_list) > 0:
+                    for noun_phrase in nlp(target_match).noun_chunks:
+                        np_list.append(noun_phrase)
+                    if len(np_list) > 0:
                         # Avoid the NP (noun phrase), if it's a stop word (e.g.
                         # You)
-                        forbidden_NP = False
+                        forbidden_np = False
                         for stop_word in stop_words:
-                            if re.search(stop_word, str(NP_list[-1])):
-                                forbidden_NP = True
-                        if forbidden_NP is False:
+                            if re.search(stop_word, str(np_list[-1])):
+                                forbidden_np = True
+                        if forbidden_np is False:
                             # Include start_word and NP in a list named
                             # 'ouput'. Choose the latest NP from the target
                             # string (e.g. 'This treatment is a medicine...'
                             # gets 'medicine' but not 'treatment')
-                            NP_outcome = str(NP_list[-1])
-                            output.append(NP_outcome)
+                            np_outcome = str(np_list[-1])
+                            output.append(np_outcome)
                             output.append(start_word)
                             output.append(matching_pattern)
                             return output
@@ -151,19 +148,19 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
                 target_match = message[message.find(
                     longest_match) + len(longest_match):]
                 if len(target_match) >= 3:
-                    for np in nlp(target_match).noun_chunks:
-                        NP_list.append(np)
-                    if len(NP_list) > 0:
-                        forbidden_NP = False
+                    for noun_phrase in nlp(target_match).noun_chunks:
+                        np_list.append(noun_phrase)
+                    if len(np_list) > 0:
+                        forbidden_np = False
                         for stop_word in stop_words:
-                            if re.search(stop_word, str(NP_list[0])):
-                                forbidden_NP = True
-                        if forbidden_NP is False:
+                            if re.search(stop_word, str(np_list[0])):
+                                forbidden_np = True
+                        if forbidden_np is False:
                             # Choose the first NP from the target string (e.g.
                             # 'treated by a medicine from the shop', gets
                             # 'medicine' but not 'shop')
-                            NP_outcome = str(NP_list[0])
-                            output.append(NP_outcome)
+                            np_outcome = str(np_list[0])
+                            output.append(np_outcome)
                             output.append(start_word)
                             output.append(matching_pattern)
                             return output
@@ -176,4 +173,3 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
         output.append(start_word)
         output.append('<no pattern found>')
         return output
-        # return '<nothing found>'
