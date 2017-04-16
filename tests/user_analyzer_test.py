@@ -67,10 +67,11 @@ def test_user_analyzer():
     lexicon = user_analyzer.lexicon_generator(USER_GRAMMAR, dictionary)
 
     assert user_analyzer.user_analyzer('Some random person',
-                                       lexicon) == ['<no pattern>', '<unknown source>']
+                                       lexicon) == ['<no pattern>',
+                                                    '<unknown source>']
     assert user_analyzer.user_analyzer('Some physicist and father',
-                                       lexicon) == ['¡<MEDICAL_JOB>¡ (and|&) \\w+', 'physicist']
+                                       lexicon) == ['¡<MEDICAL_JOB>¡ (and|&) \\w+',
+                                                    'physicist']
     assert user_analyzer.user_analyzer('family medicine website',
-                                       lexicon) ==  ['¡<MEDICAL_ATTRIBUTE> (web|portal|site)¡', 'family medicine web']
-
-
+                                       lexicon) == ['¡<MEDICAL_ATTRIBUTE> (web|portal|site)¡',
+                                                    'family medicine web']

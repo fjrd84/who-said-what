@@ -48,12 +48,11 @@ def dictionary_parser(dictionary_file_path):
 
     for line in dictionary_file:
         line = line.rstrip()
-        entry_list = line.split('\t')
-        if entry_list[0] not in dictionary.keys():
-            dictionary[entry_list[0]] = []
-            dictionary[entry_list[0]].append(entry_list[1])
+        (entry, definition) = line.split('\t')
+        if entry not in dictionary.keys():
+            dictionary[entry] = [definition]
         else:
-            dictionary[entry_list[0]].append(entry_list[1])
+            dictionary[entry].append(definition)
 
     dictionary_file.close()
 
@@ -61,8 +60,8 @@ def dictionary_parser(dictionary_file_path):
     # e.g. <MEDICAL_JOB> \t <ADMINISTRATIVE_JOB>. It replaces the node for all
     # its words
     for (entry, values) in dictionary.items():
-        nodes = [value.split('|') for value in values if is_tag(value)]
-        for node_variations in nodes:
+        nodes_with_variations = [value.split('|') for value in values if is_tag(value)]
+        for node_variations in nodes_with_variations:
             for insidenode in node_variations:
                 if insidenode in dictionary.keys():
                     for definition in dictionary[insidenode]:
