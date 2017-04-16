@@ -29,15 +29,15 @@ def file_parser(path, to_lower):
     """
     Helper function to parse text files.
     """
-    grammar_file = open(path, 'r')
-    grammar = []
-    for l in grammar_file:
-        l = l.strip()
+    input_file = open(path, 'r')
+    results = []
+    for line in input_file:
+        line = line.strip()
         if to_lower:
-            l = l.lower()
-        grammar.append(l)
-    grammar_file.close()
-    return grammar
+            line = line.lower()
+        results.append(line)
+    input_file.close()
+    return results
 
 def language_data_loader(grammar_path, start_words_path, stop_words_path):
     """
