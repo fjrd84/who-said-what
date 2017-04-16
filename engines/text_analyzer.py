@@ -23,7 +23,9 @@ mentioned disease.
 
 """
 import re
-
+from spacy.en import English
+# Function for text processing with Spacy
+NLP = English()
 
 def file_parser(path, to_lower):
     """
@@ -79,7 +81,7 @@ def start_word_match(message, start_words):
     return start_word
 
 
-def analyzer(message, start_words, stop_words, grammar, nlp):
+def analyzer(message, start_words, stop_words, grammar):
     """
     Analyzer (treatment-entity finder)
     The input grammar follows two basic syntactic schemes,
@@ -88,7 +90,7 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
     (b) Y treated with X -> Y comes first.
     """
     # Find the start word in message:
-    start_word = start_word_match(message, start_words)
+    start_word = start_word_match(message, start_words) or ''
     twitter_start_word = '(' + '#' + start_word + '|' + start_word + ')'
     # Necessary variables:
     longest_match = ''
@@ -120,7 +122,7 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
                 # target_match = unicode(target_match, "utf-8" )
                 if len(target_match) >= 3:
                     # # Search NPs within target_match (target string):
-                    for noun_phrase in nlp(target_match).noun_chunks:
+                    for noun_phrase in NLP(target_match).noun_chunks:
                         np_list.append(noun_phrase)
                     if len(np_list) > 0:
                         # Avoid the NP (noun phrase), if it's a stop word (e.g.
@@ -148,7 +150,7 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
                 target_match = message[message.find(
                     longest_match) + len(longest_match):]
                 if len(target_match) >= 3:
-                    for noun_phrase in nlp(target_match).noun_chunks:
+                    for noun_phrase in NLP(target_match).noun_chunks:
                         np_list.append(noun_phrase)
                     if len(np_list) > 0:
                         forbidden_np = False
