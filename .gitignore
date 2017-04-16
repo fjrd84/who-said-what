@@ -4,3 +4,4 @@ cover
 *.pyc
 venv
 .coverage
+.DS_Store
