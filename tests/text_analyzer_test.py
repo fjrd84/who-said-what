@@ -37,3 +37,19 @@ def test_language_data_loader():
     assert '^@\\w+$' in language_data['stop_words']
     assert '[s] \\w+ed to (healthier|better)( \\S+){0,7} [p]' in language_data['grammar']
     assert r'[s] effective( \w+){0,2} (in|for|to)( \w+){0,5} [p]' in language_data['grammar']
+
+
+def test_start_word_match():
+    """
+    Start word match tests
+    """
+    result = text_analyzer.start_word_match("Some input message",
+                                            ['one', 'word'])
+    assert result is None
+    result = text_analyzer.start_word_match("Some input message",
+                                            ['input', 'word'])
+    assert result == 'input'
+    result = text_analyzer.start_word_match(
+        "Some input message about anorexia nervosa and other things",
+        ['one', 'word', 'anorexia', 'unrelated', 'anorexia nervosa'])
+    assert result == 'anorexia nervosa'

@@ -39,6 +39,7 @@ def file_parser(path, to_lower):
     input_file.close()
     return results
 
+
 def language_data_loader(grammar_path, start_words_path, stop_words_path):
     """
     It receives three file paths as input:
@@ -59,23 +60,26 @@ def language_data_loader(grammar_path, start_words_path, stop_words_path):
     return language_data
 
 
-def start_word_match(message, start_word_list):
+def start_word_match(message, start_words):
     """
-    'start word' finder:
+    'start word' finder: it looks for start words within a given message.
+    Start words might be regular expressions.
+    When a match is found, the whole match will be returned. Otherwise,
+    None is returned.
     """
     start_word = ''
-    for w in start_word_list:
-        if re.search(w, message):
-            start_word_is_now = message[re.search(
-                w, message).start():re.search(w, message).end()]
-            if len(start_word_is_now) > len(start_word):
-                start_word = start_word_is_now
+    for word in start_words:
+        if re.search(word, message):
+            current_word = message[re.search(word, message).start():
+                                   re.search(word, message).end()]
+            if len(current_word) > len(start_word):
+                start_word = current_word
     # we search for the longest match ('Mindfulness for anorexia nervosa' gets
     # 'anorexia nervosa' but not 'anorexia', although both are disease terms)
     if len(start_word) > 0:
         return start_word
     elif len(start_word) == 0:
-        return '<No start word in message>'
+        return None
 
 
 def analyzer(message, start_words, stop_words, grammar, nlp):
@@ -95,7 +99,7 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
     output = []
     NP_list = []
     # First, check if start_word is in message
-    if start_word != '<No start word in message>':
+    if start_word != None:
         # For every stored grammar rule, generate its counterpart including the
         # start word (e.g. '[s] for [p]' -> '[s] for anorexia')
         for pattern in grammar:
