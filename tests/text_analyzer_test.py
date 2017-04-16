@@ -53,3 +53,28 @@ def test_start_word_match():
         "Some input message about anorexia nervosa and other things",
         ['one', 'word', 'anorexia', 'unrelated', 'anorexia nervosa'])
     assert result == 'anorexia nervosa'
+
+
+def test_analyzer():
+    """
+    Analyzer tests
+    """
+    language_data = text_analyzer.language_data_loader(
+        GRAMMAR_PATH,
+        START_WORDS_PATH,
+        STOP_WORDS_PATH)
+    message = "#exercise helps regulate mood, can improve depression " \
+        "and helps fight against diabetes, cancer + heart disease. " \
+        "https://t.co/sw6mvsslg"
+    analysis = text_analyzer.analyzer(message,
+                                      language_data['start_words'],
+                                      language_data['stop_words'],
+                                      language_data['grammar'])
+    assert analysis[1] == 'heart disease'
+    assert analysis[0] == 'mood'
+    message = "some unrelated message that only talks about watching tv"
+    analysis = text_analyzer.analyzer(message,
+                                      language_data['start_words'],
+                                      language_data['stop_words'],
+                                      language_data['grammar'])
+    assert analysis[0] == '<nothing_found>'
