@@ -173,20 +173,3 @@ def analyzer(message, start_words, stop_words, grammar, nlp):
         output.append('<no pattern found>')
         return output
         # return '<nothing found>'
-
-# Use this to try text_analyzer on a corpus or a single sentence:
-
-# s = str('new treatment for people with vasculopathy')
-# language_data = language_data_loader()
-# print
-# analyzer(s,language_data['start_words'],language_data['grammar'],language_data['stop_words'])
-
-# path_to_testing_corpus = '/Users/DoraDorita/Desktop/NLP/corpus/'
-# corpus = open(path_to_testing_corpus+'all.txt', 'r').readlines()
-# language_data = language_data_loader()
-# for l in corpus:
-#     l = l.rstrip()
-#     l = l.split('  @@@  ')[0]
-#     l = l.decode('utf-8')
-#     result = analyzer(l,language_data['start_words'],language_data['grammar'],language_data['stop_words'])
-#     print result[0], '-->', result[1]
